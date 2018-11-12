@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74529affa61dcf6479aee7f7b42dac8d, type: 3}
+  m_Name: PoolSetting
+  m_EditorClassIdentifier: 
+  key: testKey
+  prefab: {fileID: 1897711075623166, guid: 6125b66badddfe34ca3a1010ae68e89f, type: 2}
+  initialSize: 5
