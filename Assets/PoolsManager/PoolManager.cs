@@ -6,13 +6,15 @@ namespace PoolsManagement
 {
     public class PoolManager : MonoBehaviour
     {
-
         static PoolManager _globalPoolManager;
 
         public event Action<PoolManager> OnPoolManagerDestroyed;
 
+#pragma warning disable CS0649
         [SerializeField]
+        [Tooltip("Initial pool setting")]
         BasePoolSettings[] _initialPools;
+#pragma warning restore CS0649
 
         Hashtable _pools;
 
@@ -40,17 +42,9 @@ namespace PoolsManagement
                 foreach (BasePoolSettings poolSet in _initialPools)
                 {
                     yield return poolSet.PreparePrefab();
-                    GetPool(poolSet);
+                    GetOrCreatePool(poolSet);
                 }
             }
-        }
-
-        public Pool GetPool(BasePoolSettings poolSettings)
-        {
-            Pool pool = GetPool(poolSettings.key);
-            if (pool != null)
-                return pool;
-            return CreateNewPool(poolSettings);
         }
 
         public Pool GetPool(string key)
@@ -58,20 +52,42 @@ namespace PoolsManagement
             return _pools[key] as Pool;
         }
 
+        public Pool GetOrCreatePool(BasePoolSettings poolSettings)
+        {
+            Pool pool = GetPool(poolSettings.key);
+            if (pool != null)
+                return pool;
+            return CreateNewPool(poolSettings);
+        }
+
+        public Pool GetOrCreatePool(string key, GameObject prefab, int initialSize = 0)
+        {
+            Pool pool = GetPool(key);
+            if (pool != null)
+                return pool;
+            return CreateNewPool(key, prefab, initialSize);
+        }
+
         Pool CreateNewPool(BasePoolSettings poolSettings)
         {
-            string key = poolSettings.key;
+            Pool newPool = CreateNewPool(poolSettings.key, poolSettings.GetPrefab(), poolSettings.initialSize);
+            poolSettings.SetPool(newPool);
+            return newPool;
+        }
+
+        Pool CreateNewPool(string key, GameObject prefab, int initialSize)
+        {
             Transform newHolder = new GameObject("Holder_" + key).transform;
             newHolder.SetParent(transform);
-            var newPool = new Pool(this, poolSettings, newHolder);
+            var newPool = new Pool(this, key, prefab, initialSize, newHolder);
             _pools.Add(key, newPool);
-            if (poolSettings.pool == null)
-                poolSettings.SetPool(newPool);
             return newPool;
         }
 
         void OnDestroy()
         {
+            _pools.Clear();
+
             OnPoolManagerDestroyed?.Invoke(this);
 
             if (_globalPoolManager == this)

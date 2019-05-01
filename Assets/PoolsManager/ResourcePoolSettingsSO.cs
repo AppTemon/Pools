@@ -6,12 +6,14 @@ namespace PoolsManagement
     [CreateAssetMenu(fileName = "PoolSetting", menuName = "Pools/ResourcePoolSetting")]
     public class ResourcePoolSettingsSO : BasePoolSettings
     {
+#pragma warning disable CS0649
         [SerializeField]
         [Tooltip("Path to poolable object's prefab")]
         string _prefabPath;
         [SerializeField]
         [Tooltip("Poolable object's prefab name")]
         string _prefabName;
+#pragma warning restore CS0649
 
         public override GameObject GetPrefab()
         {
@@ -30,10 +32,10 @@ namespace PoolsManagement
                 _prefabObject = request.asset as GameObject;
         }
 
-        public override void OnPoolDestroyed()
+        protected override void OnPoolDestroyed(Pool destroyedPool)
         {
             _prefabObject = null;
-            base.OnPoolDestroyed();
+            base.OnPoolDestroyed(destroyedPool);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace PoolsManagement
     {
         void ReturnToPool();
         void OnPoolableTaken();
-        void InitializePoolable(BasePoolSettings poolSet);
+        void InitializePoolable(string key, Pool pool);
         T GetComponent<T>();
         GameObject gameObject { get; }
         Transform transform { get; }

@@ -1,25 +1,28 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace PoolsManagement
 {
     public class Pool
     {
-        PoolManager _poolManager;
+        public event Action<Pool> OnPoolDestroyed;
+
         Transform _holder;
-        BasePoolSettings _poolSet;
+        string _key;
+        GameObject _prefab;
         Stack<IPoolable> _poolledObjects = new Stack<IPoolable>();
 
         private readonly bool _prefabHasIPoolable;
 
-        public Pool(PoolManager poolManager, BasePoolSettings poolSet, Transform holder)
+        public Pool(PoolManager poolManager, string newKey, GameObject newPrefab, int initialSize, Transform newHolder)
         {
-            _poolManager = poolManager;
-            _holder = holder;
-            _poolSet = poolSet;
-            _prefabHasIPoolable = _poolSet.GetPrefab().GetComponent<IPoolable>() != null;
-            _poolManager.OnPoolManagerDestroyed += OnPoolManagerDestroyed;
-            for (int i = 0; i < _poolSet.initialSize; i++) 
+            _holder = newHolder;
+            _key = newKey;
+            _prefab = newPrefab;
+            _prefabHasIPoolable = _prefab.GetComponent<IPoolable>() != null;
+            poolManager.OnPoolManagerDestroyed += OnPoolManagerDestroyed;
+            for (int i = 0; i < initialSize; i++)
                 _poolledObjects.Push(CreateNewPoolableObject());
         }
 
@@ -49,7 +52,7 @@ namespace PoolsManagement
 
         IPoolable CreateNewPoolableObject()
         {
-            GameObject newObj = GameObject.Instantiate(_poolSet.GetPrefab(), _holder, false);
+            GameObject newObj = GameObject.Instantiate(_prefab, _holder, false);
             IPoolable poolable = null;
             if (_prefabHasIPoolable)
             {
@@ -61,15 +64,15 @@ namespace PoolsManagement
             {
                 poolable = newObj.AddComponent<PoolableObject>();
             }
-            poolable.InitializePoolable(_poolSet);
+            poolable.InitializePoolable(_key, this);
             return poolable;
         }
 
-        void OnPoolManagerDestroyed(PoolManager poolManager)
+        void OnPoolManagerDestroyed(PoolManager destroyedPoolManager)
         {
-            if (poolManager == _poolManager)
-                if (_poolSet.pool == this)
-                    _poolSet.OnPoolDestroyed();
+            _prefab = null;
+            destroyedPoolManager.OnPoolManagerDestroyed -= OnPoolManagerDestroyed;
+            OnPoolDestroyed?.Invoke(this);
         }
     }
 }

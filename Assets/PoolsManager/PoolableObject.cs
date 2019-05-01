@@ -7,18 +7,20 @@ namespace PoolsManagement
     {
         public event Action OnTakenFromPool;
 
-        public BasePoolSettings poolSettings => _poolSettings;
+        public string poolKey => _poolKey;
+        public Pool pool => _pool;
         public bool isInPool => _isInPool;
 
-        protected bool _isInPool;
-        protected BasePoolSettings _poolSettings;
+        bool _isInPool;
+        string _poolKey;
+        Pool _pool;
 
         public void ReturnToPool()
         {
             _isInPool = true;
             gameObject.SetActive(false);
-            if (_poolSettings.pool != null)
-                _poolSettings.ReturnToPool(this);
+            if (_pool != null)
+                _pool.ReturnPoolable(this);
             else
                 Destroy(gameObject);
         }
@@ -30,10 +32,11 @@ namespace PoolsManagement
             OnTakenFromPool?.Invoke();
         }
 
-        public virtual void InitializePoolable(BasePoolSettings poolSettings)
+        public virtual void InitializePoolable(string key, Pool newPool)
         {
             _isInPool = true;
-            _poolSettings = poolSettings;
+            _poolKey = key;
+            _pool = newPool;
             gameObject.SetActive(false);
         }
     }
