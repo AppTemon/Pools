@@ -1,66 +1,40 @@
 using UnityEngine;
+using System;
 
-namespace PoolsManagement {
-    /// <summary>
-    /// Simplest poolable object
-    /// </summary>
-    public class PoolableObject : MonoBehaviour, IPoolable {
+namespace PoolsManagement
+{
+    public class PoolableObject : MonoBehaviour, IPoolable
+    {
+        public event Action OnTakenFromPool;
 
-        public delegate void PoolableEvent();
+        public BasePoolSettings poolSettings => _poolSettings;
+        public bool isInPool => _isInPool;
 
-        /// <summary>
-        /// Invoked when poolable taken from pool
-        /// </summary>
-        public event PoolableEvent OnTaken;
+        protected bool _isInPool;
+        protected BasePoolSettings _poolSettings;
 
-        /// <summary>
-        /// True if object in pool
-        /// </summary>
-        [SerializeField]
-        public bool IsInPool { get; protected set; }
-        protected PoolSettingsSO poolSet;
-
-        /// <summary>
-        /// Use it to return object to pool instead destroying
-        /// </summary>
-        public void ReturnToPool() {
-            IsInPool = true;
+        public void ReturnToPool()
+        {
+            _isInPool = true;
             gameObject.SetActive(false);
-            Pool poolInst = poolSet.GetPool();
-            if (poolInst != null) {
-                if (transform.parent != poolInst.holder) {
-                    transform.SetParent(poolInst.holder);
-                }
-            }
-            poolSet.ReturnToPool(this);
+            if (_poolSettings.pool != null)
+                _poolSettings.ReturnToPool(this);
+            else
+                Destroy(gameObject);
         }
 
-        /// <summary>
-        /// Called when iPoolable was taken from pool
-        /// </summary>
-        public virtual void OnPoolableTaken() {
-            IsInPool = false;
+        public virtual void OnPoolableTaken()
+        {
+            _isInPool = false;
             gameObject.SetActive(true);
-            if (OnTaken != null) {
-                OnTaken.Invoke();
-            }
+            OnTakenFromPool?.Invoke();
         }
 
-        /// <summary>
-        /// Called when new iPoolable was created
-        /// </summary>
-        public virtual void InitializePoolable(PoolSettingsSO _poolSet) {
-            IsInPool = true;
-            poolSet = _poolSet;
+        public virtual void InitializePoolable(BasePoolSettings poolSettings)
+        {
+            _isInPool = true;
+            _poolSettings = poolSettings;
             gameObject.SetActive(false);
-        }
-
-        /// <summary>
-        /// Just return gameObject
-        /// </summary>
-        /// <returns></returns>
-        public GameObject GetGameObject() {
-            return gameObject;
         }
     }
 }

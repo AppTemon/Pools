@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d896b21052e877a4e9312e6c17b41883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPools:
+  _initialPools:
   - {fileID: 11400000, guid: d924ebc35b9866f46ae38772d8f35c9e, type: 2}
 --- !u!1 &853087615
 GameObject:
@@ -184,8 +184,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   getFromPool: 0
   returnToPool: 0
-  poolSet: {fileID: 11400000, guid: 409d9e3d0ee2ba5489428364a14c17cf, type: 2}
+  poolSet: {fileID: 11400000, guid: 7e229fa787a20ed47834d7bc17ee64ba, type: 2}
   testlist: []
+  testComp: {fileID: 0}
 --- !u!4 &853087617
 Transform:
   m_ObjectHideFlags: 0
@@ -230,6 +231,7 @@ MonoBehaviour:
   returnToPool: 0
   poolSet: {fileID: 11400000, guid: d924ebc35b9866f46ae38772d8f35c9e, type: 2}
   testlist: []
+  testComp: {fileID: 0}
 --- !u!4 &1487835952
 Transform:
   m_ObjectHideFlags: 0
